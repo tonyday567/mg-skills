@@ -65,9 +65,40 @@ print(json.dumps(sys.stdin.read().strip()))
   }
 })()"
 
-sleep 1.5
+sleep 1.0
 
-# 4. Click send
+# 4. Verify text landed in the input field
+VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" "(function() {
+  var editor = document.querySelector('$INPUT_SELECTOR');
+  return editor ? editor.innerText : '';
+})()")
+
+VERIFY_TMP="/tmp/chat-verify-$$.txt"
+printf '%s' "$VERIFY_TEXT" > "$VERIFY_TMP"
+
+if ! diff -q "$VERIFY_TMP" "$MESSAGE_FILE" >/dev/null 2>&1; then
+  echo "⚠️ Verification failed — retrying paste"
+  sleep 0.5
+  "$SCRIPT_DIR/browser-eval.js" "(function() {
+    var editor = document.querySelector('$INPUT_SELECTOR');
+    if (editor) {
+      editor.innerText = $ESCAPED;
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  })()"
+  sleep 1.0
+  VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" "(function() {
+    var editor = document.querySelector('$INPUT_SELECTOR');
+    return editor ? editor.innerText : '';
+  })()")
+  printf '%s' "$VERIFY_TEXT" > "$VERIFY_TMP"
+  if ! diff -q "$VERIFY_TMP" "$MESSAGE_FILE" >/dev/null 2>&1; then
+    echo "⚠️ Send verification failed: text may not have landed correctly"
+  fi
+fi
+rm -f "$VERIFY_TMP"
+
+# 5. Click send
 "$SCRIPT_DIR/browser-eval.js" "(function() {
   var sendBtn = document.querySelector('$SEND_SELECTOR');
   if (sendBtn) {

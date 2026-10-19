@@ -24,7 +24,7 @@ PROMPT="$*"
 
 # Build temp prompt file
 PROMPT_FILE="/tmp/ai-prompt-$TIMESTAMP.txt"
-echo "$PROMPT" > "$PROMPT_FILE"
+printf '%s' "$PROMPT" > "$PROMPT_FILE"
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] CHAT START → $SYSTEM" | tee -a "$AUDIT_LOG"
 
