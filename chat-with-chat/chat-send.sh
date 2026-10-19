@@ -67,7 +67,7 @@ print(json.dumps(sys.stdin.read().strip()))
   }
 })()"
 
-sleep 1.0
+sleep 0.3
 
 # 4. Verify text landed in the input field
 VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" --url "$DOMAIN" "(function() {
