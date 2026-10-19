@@ -15,14 +15,14 @@ fi
 
 echo "🚀 Launching Chrome with debug profile..."
 
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+nohup "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
   --remote-debugging-port=$PORT \
   --user-data-dir="$PROFILE_DIR" \
   --no-first-run \
   --no-default-browser-check \
   --disable-background-networking \
   --disable-default-apps \
-  &
+  >/dev/null 2>&1 &
 
 sleep 3
 echo "✅ Chrome launched. Waiting for tabs..."
