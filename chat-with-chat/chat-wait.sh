@@ -52,6 +52,7 @@ for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
   STREAMING=$("$SCRIPT_DIR/browser-eval.js" --url "$URL_PATTERN" "
     (function() {
       var bubbles = document.querySelectorAll('$BUBBLE_CLASS');
+      if (bubbles.length === 0) return true;
       var last = bubbles[bubbles.length - 1];
       return last ? (last.innerText.trim().endsWith('...') || last.querySelector('.animate-pulse, .streaming') !== null) : false;
     })()

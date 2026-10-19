@@ -5,16 +5,17 @@
 #        ./chat-with-claude.sh "What is a functor?"  # inline prompt
 #
 # Multi-turn: run repeatedly in same Claude tab; context accumulates.
-# Output: appended to loom/claude-session-<date>.md
+# Lockdown contract: stdout is chat-with-chat's exchange, byte for byte.
+# Session log: logs/claude-session-<date>.md (skill-local, gitignored).
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SESSION_LOG="$HOME/mg/loom/claude-session-$(date +%Y-%m-%d).md"
+SESSION_LOG="$SCRIPT_DIR/logs/claude-session-$(date +%Y-%m-%d).md"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 if [ $# -lt 1 ]; then
-  echo "Usage: $0 <prompt-file-or-string>"
+  echo "Usage: $0 <prompt-file-or-string>" >&2
   exit 1
 fi
 
@@ -29,10 +30,11 @@ else
   SOURCE="inline"
 fi
 
-# Ensure session log directory exists
 mkdir -p "$(dirname "$SESSION_LOG")"
 
-# Append prompt to session log
+# Send via chat-with-chat; stdout is the contract, capture for the log
+RESPONSE=$("$SCRIPT_DIR/chat-with-chat.sh" claude "$PROMPT")
+
 cat >> "$SESSION_LOG" <<EOF
 
 ---
@@ -45,16 +47,7 @@ $PROMPT
 
 **response:**
 
+$RESPONSE
 EOF
 
-# Send via chat-with-chat and capture the response
-RESPONSE=$("$SCRIPT_DIR/chat-with-chat.sh" claude "$PROMPT" 2>&1 | tail -1)
-
-# Append response to session log
-echo "$RESPONSE" >> "$SESSION_LOG"
-
-# Echo to stdout
-echo "$RESPONSE"
-
-echo ""
-echo "⟜ session log: $SESSION_LOG"
+printf '%s\n' "$RESPONSE"
