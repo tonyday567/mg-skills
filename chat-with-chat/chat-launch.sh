@@ -9,7 +9,7 @@ PORT=9222
 # Check if already running
 if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null; then
   echo "✅ Chrome already running on :$PORT"
-  ./browser-list-tabs.js | head -n 20
+  curl -s http://localhost:$PORT/json/list | jq -r '.[] | .title + " — " + .url' | head -n 20
   exit 0
 fi
 
@@ -27,4 +27,4 @@ echo "🚀 Launching Chrome with debug profile..."
 sleep 3
 echo "✅ Chrome launched. Waiting for tabs..."
 
-./browser-list-tabs.js | head -n 15
+curl -s http://localhost:$PORT/json/list | jq -r '.[] | .title + " — " + .url' | head -n 15

@@ -31,7 +31,7 @@ if curl -s http://localhost:9222/json/list > /dev/null 2>&1; then
   echo -e "${GREEN}✅ CDP port :9222 responding${NC}"
 else
   echo -e "${RED}❌ CDP port :9222 not responding${NC}"
-  echo "   Fix: Run ./browser-launch.sh to start Chrome"
+  echo "   Fix: Run ./chat-launch.sh to start Chrome"
   FAILED=1
 fi
 
