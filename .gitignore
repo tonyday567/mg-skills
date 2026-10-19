@@ -10,3 +10,4 @@ build/
 *.swo
 *~
 browser-tools/
+chat-with-chat/logs/

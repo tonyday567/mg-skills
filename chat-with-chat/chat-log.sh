@@ -30,7 +30,7 @@ if [ -z "$URL_PATTERN" ] || [ -z "$BUBBLE_CLASS" ]; then
 fi
 
 TIMESTAMP=$(date +%s)
-OUTPUT_FILE="$HOME/mg/logs/${SYSTEM}-conversation-${TIMESTAMP}.txt"
+OUTPUT_FILE="$SCRIPT_DIR/logs/${SYSTEM}-conversation-${TIMESTAMP}.txt"
 mkdir -p "$(dirname "$OUTPUT_FILE")"
 
 node "$SCRIPT_DIR/chat-log.js" "$SYSTEM" "$URL_PATTERN" "$BUBBLE_CLASS" "$OUTPUT_FILE"

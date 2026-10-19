@@ -16,7 +16,9 @@ fi
 
 SYSTEM=$(echo "$1" | tr '[:upper:]' '[:lower:]')
 MESSAGE_FILE="$2"
-AUDIT_LOG="$HOME/mg/logs/browser-chat-audit.log"
+LOG_DIR="$SCRIPT_DIR/logs"
+mkdir -p "$LOG_DIR"
+AUDIT_LOG="$LOG_DIR/audit.log"
 
 # Load system-specific config
 SYSTEM_UPPER=$(echo "$SYSTEM" | tr '[:lower:]' '[:upper:]')
@@ -31,7 +33,7 @@ if [ -z "$INPUT_SELECTOR" ] || [ -z "$SEND_SELECTOR" ]; then
   exit 1
 fi
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] SEND START → $SYSTEM" | tee -a "$AUDIT_LOG"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] SEND START → $SYSTEM" >> "$AUDIT_LOG"
 
 # 1. Ensure correct tab
 echo "Ensuring $SYSTEM tab..."
@@ -109,4 +111,4 @@ rm -f "$VERIFY_TMP"
   }
 })()"
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] SEND COMPLETE" | tee -a "$AUDIT_LOG"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] SEND COMPLETE" >> "$AUDIT_LOG"

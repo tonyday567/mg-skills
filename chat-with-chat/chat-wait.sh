@@ -16,8 +16,10 @@ fi
 
 SYSTEM=$(echo "$1" | tr '[:upper:]' '[:lower:]')
 OUTPUT_FILE="$2"
-AUDIT_LOG="$HOME/mg/logs/browser-chat-audit.log"
-CURSOR_FILE="$HOME/mg/logs/.chat-cursor"
+LOG_DIR="$SCRIPT_DIR/logs"
+mkdir -p "$LOG_DIR"
+AUDIT_LOG="$LOG_DIR/audit.log"
+CURSOR_FILE="$LOG_DIR/.chat-cursor"
 
 # Load system-specific config
 SYSTEM_UPPER=$(echo "$SYSTEM" | tr '[:lower:]' '[:upper:]')
@@ -41,7 +43,7 @@ if [ -f "$CURSOR_FILE" ]; then
 fi
 CURSOR_COUNT=${CURSOR_COUNT:-0}
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] WAIT START → $SYSTEM (cursor: $CURSOR_COUNT)" | tee -a "$AUDIT_LOG"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] WAIT START → $SYSTEM (cursor: $CURSOR_COUNT)" >> "$AUDIT_LOG"
 
 for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
   # Check streaming status
@@ -74,7 +76,7 @@ for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
       })()
     " > "$OUTPUT_FILE"
 
-    cp "$OUTPUT_FILE" "$HOME/mg/logs/${SYSTEM}-response-$(date +%s).txt"
+    cp "$OUTPUT_FILE" "$LOG_DIR/${SYSTEM}-response-$(date +%s).txt"
 
     # Update cursor with new total message count
     TOTAL_COUNT=$("$SCRIPT_DIR/browser-eval.js" "document.querySelectorAll('$RESPONSE_SELECTOR').length" 2>/dev/null || echo "0")
@@ -90,7 +92,7 @@ for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
       echo "${SYSTEM}:${TOTAL_COUNT}" > "$CURSOR_FILE"
     fi
 
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] WAIT COMPLETE — full response saved (cursor → $TOTAL_COUNT)" | tee -a "$AUDIT_LOG"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] WAIT COMPLETE — full response saved (cursor → $TOTAL_COUNT)" >> "$AUDIT_LOG"
     exit 0
   fi
 

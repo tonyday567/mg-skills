@@ -7,6 +7,14 @@ description: Multi-system web-based AI chat automation via Chrome DevTools Proto
 
 Automate conversations with web-based AI chat systems (Grok, Claude.ai, etc.) via Chrome remote debugging. Configuration-driven, no API keys required.
 
+## The agent contract
+
+The agent-facing surface is prompt and response tokens only:
+
+- Call `./chat-with-chat.sh <system> "<prompt>"`; stdout carries the response text, nothing else. Failures are one-line verdicts on stderr with exit 1.
+- Never read the `.js` files — `browser-eval.js` is plumbing, not interface. Selectors and timeouts live in `chat-tools.conf`.
+- Progress, health detail and the audit trail live in `logs/` (gitignored).
+
 ## Prerequisites
 
 - **Chrome** running with remote debugging enabled on `:9222`
