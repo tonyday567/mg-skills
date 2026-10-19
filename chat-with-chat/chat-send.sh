@@ -56,7 +56,7 @@ print(json.dumps(sys.stdin.read().strip()))
 " <<< "$INPUT")
 
 # 3. Paste into input (system-specific)
-"$SCRIPT_DIR/browser-eval.js" "(function() {
+"$SCRIPT_DIR/browser-eval.js" --url "$DOMAIN" "(function() {
   var editor = document.querySelector('$INPUT_SELECTOR');
   if (editor) {
     editor.innerText = $ESCAPED;
@@ -70,7 +70,7 @@ print(json.dumps(sys.stdin.read().strip()))
 sleep 1.0
 
 # 4. Verify text landed in the input field
-VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" "(function() {
+VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" --url "$DOMAIN" "(function() {
   var editor = document.querySelector('$INPUT_SELECTOR');
   return editor ? editor.innerText : '';
 })()")
@@ -81,7 +81,7 @@ printf '%s' "$VERIFY_TEXT" > "$VERIFY_TMP"
 if ! diff -q "$VERIFY_TMP" "$MESSAGE_FILE" >/dev/null 2>&1; then
   echo "⚠️ Verification failed — retrying paste"
   sleep 0.5
-  "$SCRIPT_DIR/browser-eval.js" "(function() {
+  "$SCRIPT_DIR/browser-eval.js" --url "$DOMAIN" "(function() {
     var editor = document.querySelector('$INPUT_SELECTOR');
     if (editor) {
       editor.innerText = $ESCAPED;
@@ -89,7 +89,7 @@ if ! diff -q "$VERIFY_TMP" "$MESSAGE_FILE" >/dev/null 2>&1; then
     }
   })()"
   sleep 1.0
-  VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" "(function() {
+  VERIFY_TEXT=$("$SCRIPT_DIR/browser-eval.js" --url "$DOMAIN" "(function() {
     var editor = document.querySelector('$INPUT_SELECTOR');
     return editor ? editor.innerText : '';
   })()")
@@ -101,7 +101,7 @@ fi
 rm -f "$VERIFY_TMP"
 
 # 5. Click send
-"$SCRIPT_DIR/browser-eval.js" "(function() {
+"$SCRIPT_DIR/browser-eval.js" --url "$DOMAIN" "(function() {
   var sendBtn = document.querySelector('$SEND_SELECTOR');
   if (sendBtn) {
     sendBtn.click();

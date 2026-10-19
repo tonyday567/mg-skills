@@ -95,7 +95,7 @@ for SYS in "${SYSTEMS[@]}"; do
     
     # Check for input field (via selector)
     if [ -n "$INPUT_SELECTOR" ]; then
-      INPUT_CHECK=$("$SCRIPT_DIR/browser-eval.js" "document.querySelector('$INPUT_SELECTOR') !== null" 2>/dev/null || echo "false")
+      INPUT_CHECK=$("$SCRIPT_DIR/browser-eval.js" --url "$TAB_URL" "document.querySelector('$INPUT_SELECTOR') !== null" 2>/dev/null || echo "false")
       if [ "$INPUT_CHECK" = "true" ]; then
         echo -e "   ${GREEN}✅ Input field found${NC}"
       else

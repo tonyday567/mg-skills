@@ -2,12 +2,18 @@
 
 import puppeteer from "puppeteer-core";
 
-const code = process.argv.slice(2).join(" ");
+const args = process.argv.slice(2);
+let urlPattern = null;
+if (args[0] === "--url") {
+	urlPattern = args[1];
+	args.splice(0, 2);
+}
+const code = args.join(" ");
 if (!code) {
-	console.log("Usage: browser-eval.js 'code'");
+	console.log("Usage: browser-eval.js [--url <pattern>] 'code'");
 	console.log("\nExamples:");
 	console.log('  browser-eval.js "document.title"');
-	console.log('  browser-eval.js "document.querySelectorAll(\'a\').length"');
+	console.log('  browser-eval.js --url grok.com "document.querySelectorAll(\'a\').length"');
 	process.exit(1);
 }
 
@@ -23,11 +29,20 @@ const b = await Promise.race([
 	process.exit(1);
 });
 
-const p = (await b.pages()).at(-1);
-
-if (!p) {
-	console.error("✗ No active tab found");
-	process.exit(1);
+const pages = await b.pages();
+let p;
+if (urlPattern) {
+	p = pages.find((x) => x.url().toLowerCase().includes(urlPattern.toLowerCase()) && !x.url().includes("stripe"));
+	if (!p) {
+		console.error(`✗ No tab found matching '${urlPattern}'`);
+		process.exit(1);
+	}
+} else {
+	p = pages.at(-1);
+	if (!p) {
+		console.error("✗ No active tab found");
+		process.exit(1);
+	}
 }
 
 const result = await p.evaluate((c) => {

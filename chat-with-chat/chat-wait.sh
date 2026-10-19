@@ -30,6 +30,8 @@ INTERVAL_VAR="${SYSTEM_UPPER}_INTERVAL"
 BUBBLE_CLASS="${!BUBBLE_VAR}"
 TIMEOUT="${!TIMEOUT_VAR}"
 INTERVAL="${!INTERVAL_VAR}"
+URL_VAR="${SYSTEM_UPPER}_URL_PATTERN"
+URL_PATTERN="${!URL_VAR}"
 
 if [ -z "$BUBBLE_CLASS" ]; then
   echo "❌ Unknown system: $SYSTEM"
@@ -47,7 +49,7 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] WAIT START → $SYSTEM (cursor: $CURSOR_COU
 
 for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
   # Check streaming status
-  STREAMING=$("$SCRIPT_DIR/browser-eval.js" "
+  STREAMING=$("$SCRIPT_DIR/browser-eval.js" --url "$URL_PATTERN" "
     (function() {
       var bubbles = document.querySelectorAll('$BUBBLE_CLASS');
       var last = bubbles[bubbles.length - 1];
@@ -63,7 +65,7 @@ for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
     RESPONSE_SELECTOR="${!RESPONSE_SELECTOR_VAR}"
     [ -z "$RESPONSE_SELECTOR" ] && RESPONSE_SELECTOR=".font-claude-response"
     
-    "$SCRIPT_DIR/browser-eval.js" "
+    "$SCRIPT_DIR/browser-eval.js" --url "$URL_PATTERN" "
       (function() {
         var containers = Array.from(document.querySelectorAll('$RESPONSE_SELECTOR'));
         var cursor = ${CURSOR_COUNT};
@@ -79,7 +81,7 @@ for ((i=0; i<TIMEOUT/INTERVAL; i++)); do
     cp "$OUTPUT_FILE" "$LOG_DIR/${SYSTEM}-response-$(date +%s).txt"
 
     # Update cursor with new total message count
-    TOTAL_COUNT=$("$SCRIPT_DIR/browser-eval.js" "document.querySelectorAll('$RESPONSE_SELECTOR').length" 2>/dev/null || echo "0")
+    TOTAL_COUNT=$("$SCRIPT_DIR/browser-eval.js" --url "$URL_PATTERN" "document.querySelectorAll('$RESPONSE_SELECTOR').length" 2>/dev/null || echo "0")
     TOTAL_COUNT=$(echo "$TOTAL_COUNT" | tr -d '[:space:]' || echo "0")
     TOTAL_COUNT=${TOTAL_COUNT:-0}
 
